@@ -1,90 +1,113 @@
-!DOCTYPE html
-html
-head
-    titleMy Phone Infotitle
-    style
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Phone Info</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
         body {
-            font-family Arial;
-            background #0f172a;
-            color white;
-            text-align center;
-            padding 20px;
+            font-family: Arial, sans-serif;
+            background: #0f172a;
+            color: white;
+            text-align: center;
+            padding: 20px;
         }
+
         .box {
-            background #1e293b;
-            padding 15px;
-            margin 10px;
-            border-radius 10px;
+            background: #1e293b;
+            padding: 15px;
+            margin: 10px auto;
+            border-radius: 10px;
+            max-width: 400px;
         }
+
         button {
-            padding 10px 20px;
-            background #22c55e;
-            border none;
-            border-radius 5px;
-            color white;
-            cursor pointer;
+            padding: 10px 20px;
+            background: #22c55e;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            margin-top: 10px;
         }
-    style
-head
+    </style>
+</head>
 
-body
+<body>
 
-    h1📱 My Phone Info Dashboardh1
+    <h1>📱 Phone Info Dashboard</h1>
 
-    div class=box id=devicediv
-    div class=box id=batterydiv
-    div class=box id=networkdiv
-    div class=box id=locationdiv
+    <div class="box" id="device">Loading device info...</div>
+    <div class="box" id="battery">Loading battery info...</div>
+    <div class="box" id="network">Loading network info...</div>
+    <div class="box" id="location">Location not fetched yet</div>
 
-    button onclick=getLocation()Get Location 📍button
+    <button onclick="getLocation()">Get Location 📍</button>
 
-    script
-         Device Info
-        document.getElementById(device).innerHTML = `
-            h3Device Infoh3
-            User Agent ${navigator.userAgent} br
-            Platform ${navigator.platform} br
-            Language ${navigator.language}
+    <script>
+        // DEVICE INFO
+        document.getElementById("device").innerHTML = `
+            <h3>Device Info</h3>
+            <p><b>User Agent:</b> ${navigator.userAgent}</p>
+            <p><b>Platform:</b> ${navigator.platform}</p>
+            <p><b>Language:</b> ${navigator.language}</p>
         `;
 
-         Battery Info
-        if (navigator.getBattery) {
+        // BATTERY INFO (FIXED SAFE CHECK)
+        if ('getBattery' in navigator) {
             navigator.getBattery().then(function(battery) {
-                document.getElementById(battery).innerHTML = `
-                    h3Batteryh3
-                    Level ${battery.level  100}% br
-                    Charging ${battery.charging}
+                document.getElementById("battery").innerHTML = `
+                    <h3>Battery</h3>
+                    <p>Level: ${Math.round(battery.level * 100)}%</p>
+                    <p>Charging: ${battery.charging ? "Yes 🔌" : "No"}</p>
                 `;
             });
         } else {
-            document.getElementById(battery).innerHTML = Battery info not supported;
+            document.getElementById("battery").innerHTML = `
+                <h3>Battery</h3>
+                <p>Not supported on this device</p>
+            `;
         }
 
-         Network Info
-        if (navigator.connection) {
-            document.getElementById(network).innerHTML = `
-                h3Networkh3
-                Type ${navigator.connection.effectiveType}
+        // NETWORK INFO (SAFE CHECK)
+        if ('connection' in navigator) {
+            document.getElementById("network").innerHTML = `
+                <h3>Network</h3>
+                <p>Type: ${navigator.connection.effectiveType}</p>
             `;
         } else {
-            document.getElementById(network).innerHTML = Network info not supported;
+            document.getElementById("network").innerHTML = `
+                <h3>Network</h3>
+                <p>Not supported</p>
+            `;
         }
 
-         Location
+        // LOCATION (FIXED ERROR HANDLING)
         function getLocation() {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    document.getElementById(location).innerHTML = `
-                        h3Locationh3
-                        Latitude ${position.coords.latitude} br
-                        Longitude ${position.coords.longitude}
-                    `;
-                });
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        document.getElementById("location").innerHTML = `
+                            <h3>Location</h3>
+                            <p>Latitude: ${position.coords.latitude}</p>
+                            <p>Longitude: ${position.coords.longitude}</p>
+                        `;
+                    },
+                    function(error) {
+                        document.getElementById("location").innerHTML = `
+                            <h3>Location</h3>
+                            <p>Permission denied or error</p>
+                        `;
+                    }
+                );
             } else {
-                alert(Geolocation not supported);
+                document.getElementById("location").innerHTML = `
+                    <h3>Location</h3>
+                    <p>Geolocation not supported</p>
+                `;
             }
         }
-    script
+    </script>
 
-body
-html
+</body>
+</html>
